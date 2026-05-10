@@ -77,6 +77,8 @@ export const TOOL_CONFIGS: Record<string, ToolConfig> = {
   "cdr-to-pdf": config({ slug: "cdr-to-pdf", queue: "vectorQueue", worker: "vector", acceptedMimeTypes: ["application/octet-stream", "application/x-coreldraw"], maxFiles: 1, outputExtension: "pdf", timeoutMs: 240_000 }),
   "svg-to-png": config({ slug: "svg-to-png", queue: "vectorQueue", worker: "vector", acceptedMimeTypes: ["image/svg+xml"], maxFiles: 1, outputExtension: "png" }),
   "eps-to-pdf": config({ slug: "eps-to-pdf", queue: "vectorQueue", worker: "vector", acceptedMimeTypes: ["application/postscript"], maxFiles: 1, outputExtension: "pdf" }),
+  "ai-to-png": config({ slug: "ai-to-png", queue: "vectorQueue", worker: "vector", acceptedMimeTypes: ["application/postscript", "application/vnd.adobe.illustrator", "application/vnd.adobe.illustrator.drawing.document"], maxFiles: 1, outputExtension: "png", timeoutMs: 240_000 }),
+  "ai-to-pdf": config({ slug: "ai-to-pdf", queue: "vectorQueue", worker: "vector", acceptedMimeTypes: ["application/postscript", "application/vnd.adobe.illustrator", "application/vnd.adobe.illustrator.drawing.document"], maxFiles: 1, outputExtension: "pdf", timeoutMs: 240_000 }),
   "vector-optimizer": config({ slug: "vector-optimizer", queue: "vectorQueue", worker: "vector", acceptedMimeTypes: ["image/svg+xml"], maxFiles: 1, outputExtension: "svg" }),
 
   ...many(["compress-video", "mp4-converter", "mov-to-mp4", "webm-converter", "trim-video", "resize-video", "change-video-fps", "change-video-bitrate", "remove-audio", "replace-audio", "normalize-video-audio", "add-subtitles", "burn-subtitles"], "videoQueue", "video", [...videoMime, ...audioMime, "text/plain", "application/x-subrip"], 2, "mp4", 600_000),

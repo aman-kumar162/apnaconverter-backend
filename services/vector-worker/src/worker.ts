@@ -28,6 +28,24 @@ createWorker("vectorQueue", async (job): Promise<JobResult> => {
     } else {
       await exportWithInkscape(intermediateSvg, outputPath, extension);
     }
+  } else if (job.data.tool.startsWith("ai")) {
+    // AI files are PostScript-based; convert to PDF first
+    const intermediatePdf = join(job.data.outputDir, `${job.id}-ai.pdf`);
+    await spawnBinary("gs", ["-dBATCH", "-dNOPAUSE", "-sDEVICE=pdfwrite", `-sOutputFile=${intermediatePdf}`, input.path], 120_000);
+    await job.updateProgress(55);
+    if (extension === "png" || extension === "jpg") {
+      // Convert PDF to PNG via ImageMagick
+      const pngPath = join(job.data.outputDir, `${job.id}-ai.png`);
+      await spawnBinary("convert", ["-density", "300", intermediatePdf, "-flatten", pngPath], 120_000);
+      if (extension === "jpg") {
+        await spawnBinary("convert", [pngPath, "-quality", "88", outputPath], 60_000);
+      } else {
+        await spawnBinary("convert", [pngPath, outputPath], 60_000);
+      }
+    } else {
+      // PDF output
+      await fs.copyFile(intermediatePdf, outputPath);
+    }
   } else if (job.data.tool === "svg-to-png") {
     await exportWithInkscape(input.path, outputPath, "png");
   } else if (job.data.tool === "eps-to-pdf") {
