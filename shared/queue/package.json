@@ -1,0 +1,17 @@
+{
+  "name": "@apna/queue",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsc -p tsconfig.json --watch"
+  },
+  "dependencies": {
+    "@apna/shared-types": "workspace:*",
+    "bullmq": "^5.66.0",
+    "ioredis": "^5.8.2"
+  }
+}

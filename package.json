@@ -1,0 +1,19 @@
+{
+  "name": "apna-converter-backend",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.26.0",
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "compose:dev": "docker compose -f infra/compose/docker-compose.dev.yml up --build",
+    "compose:prod": "docker compose -f infra/compose/docker-compose.prod.yml up -d --build"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.2",
+    "turbo": "^2.6.3",
+    "typescript": "^5.9.3"
+  }
+}

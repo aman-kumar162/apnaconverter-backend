@@ -1,0 +1,21 @@
+{
+  "name": "@apna/vector-worker",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/worker.js",
+  "scripts": {
+    "dev": "tsx watch src/worker.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/worker.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@apna/logger": "workspace:*",
+    "@apna/queue": "workspace:*",
+    "@apna/shared-types": "workspace:*",
+    "@apna/utils": "workspace:*",
+    "bullmq": "^5.66.0",
+    "svgo": "^4.0.0"
+  },
+  "devDependencies": { "tsx": "^4.21.0", "typescript": "^5.9.3" }
+}

@@ -1,0 +1,85 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+
+  api-gateway:
+    build:
+      context: ../..
+      dockerfile: services/api-gateway/Dockerfile
+    env_file: ../../.env.example
+    ports:
+      - "8080:8080"
+    depends_on: [redis]
+    volumes:
+      - temp-uploads:/tmp/uploads
+      - temp-output:/tmp/output
+
+  image-worker:
+    build:
+      context: ../..
+      dockerfile: services/image-worker/Dockerfile
+    env_file: ../../.env.example
+    depends_on: [redis]
+    volumes:
+      - temp-uploads:/tmp/uploads
+      - temp-output:/tmp/output
+
+  pdf-worker:
+    build:
+      context: ../..
+      dockerfile: services/pdf-worker/Dockerfile
+    env_file: ../../.env.example
+    depends_on: [redis]
+    volumes:
+      - temp-uploads:/tmp/uploads
+      - temp-output:/tmp/output
+
+  vector-worker:
+    build:
+      context: ../..
+      dockerfile: services/vector-worker/Dockerfile
+    env_file: ../../.env.example
+    depends_on: [redis]
+    volumes:
+      - temp-uploads:/tmp/uploads
+      - temp-output:/tmp/output
+
+  video-worker:
+    build:
+      context: ../..
+      dockerfile: services/video-worker/Dockerfile
+    env_file: ../../.env.example
+    depends_on: [redis]
+    volumes:
+      - temp-uploads:/tmp/uploads
+      - temp-output:/tmp/output
+
+  audio-worker:
+    build:
+      context: ../..
+      dockerfile: services/audio-worker/Dockerfile
+    env_file: ../../.env.example
+    depends_on: [redis]
+    volumes:
+      - temp-uploads:/tmp/uploads
+      - temp-output:/tmp/output
+
+  document-worker:
+    build:
+      context: ../..
+      dockerfile: services/document-worker/Dockerfile
+    env_file: ../../.env.example
+    depends_on: [redis]
+    volumes:
+      - temp-uploads:/tmp/uploads
+      - temp-output:/tmp/output
+
+volumes:
+  redis-data:
+  temp-uploads:
+  temp-output:

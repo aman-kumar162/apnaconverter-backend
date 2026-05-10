@@ -1,0 +1,100 @@
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+
+  api-gateway:
+    build:
+      context: ../..
+      dockerfile: services/api-gateway/Dockerfile
+    restart: unless-stopped
+    env_file: ../../.env
+    expose:
+      - "8080"
+    depends_on: [redis]
+    volumes:
+      - temp-uploads:/tmp/uploads
+      - temp-output:/tmp/output
+
+  image-worker:
+    build:
+      context: ../..
+      dockerfile: services/image-worker/Dockerfile
+    restart: unless-stopped
+    env_file: ../../.env
+    depends_on: [redis]
+    volumes:
+      - temp-uploads:/tmp/uploads
+      - temp-output:/tmp/output
+
+  pdf-worker:
+    build:
+      context: ../..
+      dockerfile: services/pdf-worker/Dockerfile
+    restart: unless-stopped
+    env_file: ../../.env
+    depends_on: [redis]
+    volumes:
+      - temp-uploads:/tmp/uploads
+      - temp-output:/tmp/output
+
+  vector-worker:
+    build:
+      context: ../..
+      dockerfile: services/vector-worker/Dockerfile
+    restart: unless-stopped
+    env_file: ../../.env
+    depends_on: [redis]
+    volumes:
+      - temp-uploads:/tmp/uploads
+      - temp-output:/tmp/output
+
+  video-worker:
+    build:
+      context: ../..
+      dockerfile: services/video-worker/Dockerfile
+    restart: unless-stopped
+    env_file: ../../.env
+    depends_on: [redis]
+    volumes:
+      - temp-uploads:/tmp/uploads
+      - temp-output:/tmp/output
+
+  audio-worker:
+    build:
+      context: ../..
+      dockerfile: services/audio-worker/Dockerfile
+    restart: unless-stopped
+    env_file: ../../.env
+    depends_on: [redis]
+    volumes:
+      - temp-uploads:/tmp/uploads
+      - temp-output:/tmp/output
+
+  document-worker:
+    build:
+      context: ../..
+      dockerfile: services/document-worker/Dockerfile
+    restart: unless-stopped
+    env_file: ../../.env
+    depends_on: [redis]
+    volumes:
+      - temp-uploads:/tmp/uploads
+      - temp-output:/tmp/output
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ../nginx/apna-converter.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on: [api-gateway]
+
+volumes:
+  redis-data:
+  temp-uploads:
+  temp-output:
