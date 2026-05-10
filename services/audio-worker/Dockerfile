@@ -1,5 +1,5 @@
 # Build stage
-FROM node:22-bookworm-slim AS builder
+FROM node:22-alpine AS builder
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 RUN corepack enable
@@ -11,12 +11,9 @@ RUN pnpm install --frozen-lockfile=false
 RUN pnpm --filter @apna/audio-worker... build
 
 # Runtime stage
-FROM node:22-bookworm-slim
+FROM node:22-alpine
 ENV NODE_ENV=production
-RUN apt-get update && apt-get install -y --no-install-recommends \
-  ffmpeg \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apk add --no-cache ffmpeg
 
 WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules

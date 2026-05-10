@@ -1,5 +1,5 @@
 # Build stage
-FROM node:22-bookworm-slim AS builder
+FROM node:22-alpine AS builder
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 RUN corepack enable
@@ -10,7 +10,7 @@ COPY services/pdf-worker ./services/pdf-worker
 RUN pnpm install --frozen-lockfile=false
 RUN pnpm --filter @apna/pdf-worker... build
 
-# Runtime stage
+# Runtime stage - needs LibreOffice, so use bookworm-slim
 FROM node:22-bookworm-slim
 ENV NODE_ENV=production
 RUN apt-get update && apt-get install -y --no-install-recommends \

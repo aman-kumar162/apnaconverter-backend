@@ -2,9 +2,64 @@ services:
   redis:
     image: redis:7-alpine
     restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes"]
+    # Redis auto-expires old keys and jobs
+    command: [
+      "redis-server",
+      "--appendonly", "yes",
+      "--maxmemory", "1gb",
+      "--maxmemory-policy", "allkeys-lru"
+    ]
     volumes:
       - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  cleanup:
+    build:
+      context: ../..
+      dockerfile: services/api-gateway/Dockerfile
+    restart: unless-stopped
+    command: >
+      sh -c "
+      while true; do
+        node -e \"
+        const { promises: fs } = require('node:fs');
+        const { join } = require('node:path');
+        
+        const roots = ['/tmp/uploads', '/tmp/output'];
+        const ttlMs = 15 * 60 * 1000;
+        const now = Date.now();
+        
+        for (const root of roots) {
+          fs.mkdir(root, { recursive: true }).then(() => {
+            fs.readdir(root, { withFileTypes: true }).then(entries => {
+              entries.forEach(entry => {
+                const path = join(root, entry.name);
+                fs.stat(path).then(stat => {
+                  if (now - stat.mtimeMs > ttlMs) {
+                    fs.rm(path, { recursive: true, force: true }).then(() => {
+                      console.log('Cleaned: ' + path);
+                    });
+                  }
+                });
+              });
+            });
+          });
+        }
+        \"
+        sleep 900
+      done
+      "
+    env_file: ../../.env
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - temp-uploads:/tmp/uploads
+      - temp-output:/tmp/output
 
   api-gateway:
     build:

@@ -1,0 +1,22 @@
+# Shared base image with common heavy tools
+# Used by: pdf-worker, document-worker, vector-worker
+FROM node:22-bookworm-slim AS base-tools
+
+ENV NODE_ENV=production
+
+# Install all common tools once
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  ghostscript \
+  libreoffice \
+  poppler-utils \
+  qpdf \
+  imagemagick \
+  inkscape \
+  tesseract-ocr \
+  python3-minimal \
+  python3-pip \
+  && pip3 install --no-cache-dir uniconvertor \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+WORKDIR /app

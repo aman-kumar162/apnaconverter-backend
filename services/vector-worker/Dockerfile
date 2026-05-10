@@ -1,5 +1,5 @@
 # Build stage
-FROM node:22-bookworm-slim AS builder
+FROM node:22-alpine AS builder
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 RUN corepack enable
@@ -10,18 +10,20 @@ COPY services/vector-worker ./services/vector-worker
 RUN pnpm install --frozen-lockfile=false
 RUN pnpm --filter @apna/vector-worker... build
 
-# Runtime stage
-FROM node:22-bookworm-slim
+# Runtime stage - only includes Vector-specific tools
+FROM node:22-alpine
 ENV NODE_ENV=production
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apk add --no-cache \
   inkscape \
   imagemagick \
   ghostscript \
-  python3-minimal \
-  python3-pip \
-  && pip3 install --no-cache-dir uniconvertor \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+  python3 \
+  py3-pip && \
+  py3-virtualenv && \
+  python3 -m venv /opt/venv && \
+  /opt/venv/bin/pip install --no-cache-dir uniconvertor
+
+ENV PATH=/opt/venv/bin:$PATH
 
 WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
